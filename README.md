@@ -413,18 +413,25 @@ Prediction endpoint
 
 
 https://us-documentai.googleapis.com/v1/projects/1097805338474/locations/us/processors/a13faf394c2fce1:process
-Basic information
-Name
-undp-ocr-processor
-ID
-a13faf394c2fce1
-Status
- Enabled
-Processor Type
-Document OCR
-Created
-Jun 27, 2026, 5:53:57 PM
-Encryption Type
-Google-managed
-Region
-us
+
+
+.env.example
+
+Add:
+
+DOCUMENT_AI_LOCATION=us
+DOCUMENT_AI_PROCESSOR_ID=a13faf394c2fce1
+
+## REMARK
+Why this happens
+
+Document AI synchronous OCR is not ideal for long PDFs. Later, for full documents, use batch processing from GCS input to GCS output.
+
+For now, limiting pages lets you test OCR fallback and continue building the pipeline.
+
+
+## Add chunking 
+
+Add chunking step:
+
+src/chunk/run_chunk.py
