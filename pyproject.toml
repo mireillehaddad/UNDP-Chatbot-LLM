@@ -1,0 +1,18 @@
+[project]
+name = "undp-chatbot-llm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "google-cloud-aiplatform>=1.158.0",
+    "google-cloud-documentai>=3.15.0",
+    "google-cloud-storage>=3.12.0",
+    "google-genai>=2.10.0",
+    "numpy>=2.5.0",
+    "pandas>=3.0.3",
+    "pypdf>=6.14.2",
+    "python-dotenv>=1.2.2",
+    "requests>=2.34.2",
+    "streamlit>=1.58.0",
+]
