@@ -538,3 +538,46 @@ It will:
 python -m src.retrieval.retriever
 
 ```
+
+## Build the QA layer.
+
+Create:
+
+src/chatbot/qa.py
+
+User question
+   ↓
+retrieve relevant chunks from BigQuery
+   ↓
+build context
+   ↓
+send question + context to Gemini
+   ↓
+return answer + sources
+
+After that, we connect it to:
+
+src/chatbot/app.py
+
+
+test it 
+
+```
+python -m src.chatbot.qa
+```
+
+
+## sources are duplicated. Next improve retriever.py with deduplication so Gemini gets more diverse context.
+
+
+## Next step:
+
+Build Streamlit UI
+
+src/chatbot/app.py
+
+then stest
+```
+$env:PYTHONPATH="."
+streamlit run src/chatbot/app.py
+```

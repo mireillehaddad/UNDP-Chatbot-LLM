@@ -65,29 +65,44 @@ def retrieve(question: str, top_k: int = TOP_K) -> list[dict]:
     FROM `{table_id()}`
     WHERE embedding IS NOT NULL
     ORDER BY distance ASC
-    LIMIT @top_k
+    LIMIT @candidate_k
     """
 
+    candidate_k = top_k * 5
+
     job_config = bigquery.QueryJobConfig(
-        query_parameters=[
-            bigquery.ArrayQueryParameter(
-                "query_embedding",
-                "FLOAT64",
-                query_embedding,
-            ),
-            bigquery.ScalarQueryParameter(
-                "top_k",
-                "INT64",
-                top_k,
-            ),
-        ]
-    )
+    query_parameters=[
+        bigquery.ArrayQueryParameter(
+            "query_embedding",
+            "FLOAT64",
+            query_embedding,
+        ),
+        bigquery.ScalarQueryParameter(
+            "candidate_k",
+            "INT64",
+            candidate_k,
+        ),
+     ]
+   )
 
     rows = bq_client.query(sql, job_config=job_config).result()
 
+    seen = set()
     results = []
 
     for row in rows:
+        text_key = row["text"][:300].strip().lower()
+
+        key = (
+        row["document_id"],
+        row["page_number"],
+         )
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+
         distance = float(row["distance"])
         score = 1.0 - distance
 
@@ -111,6 +126,9 @@ def retrieve(question: str, top_k: int = TOP_K) -> list[dict]:
                 "score": score,
             }
         )
+
+        if len(results) >= top_k:
+            break
 
     return results
 
