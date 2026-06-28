@@ -57,6 +57,7 @@ class Settings:
 
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "gemini-embedding-001")
     generation_model: str = os.getenv("GENERATION_MODEL", "gemini-2.5-flash")
-
+    bigquery_dataset: str = os.getenv("BIGQUERY_DATASET","undp_rag_prod",)
+    bigquery_table: str = os.getenv("BIGQUERY_TABLE","document_embeddings_prod",)
 
 settings = Settings()

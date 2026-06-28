@@ -435,3 +435,106 @@ For now, limiting pages lets you test OCR fallback and continue building the pip
 Add chunking step:
 
 src/chunk/run_chunk.py
+
+```
+python -m src.chunk.run_chunk
+
+```
+
+
+I will implement the rest in this order:
+
+* Ingest
+* Extract text
+* Chunk
+* Embed ← next
+* Load embeddings to BigQuery
+* Create the BigQuery table with a VECTOR<FLOAT64> column.
+* Replace retriever.py with a BigQuery VECTOR_SEARCH() query.
+* Add hybrid search (Vector Search + BM25) later.
+
+Add src/embed/run_embed.py 
+and run 
+
+```
+python -m src.embed.run_embed
+```
+
+## Load embeddings to BigQuery
+
+```
+uv add google-cloud-bigquery
+```
+
+create folder/file:
+
+```
+mkdir src\bigquery
+New-Item src\bigquery\__init__.py -ItemType File
+New-Item src\bigquery\load_embeddings.py -ItemType File
+```
+
+### .env.example
+BIGQUERY_DATASET=undp_rag_prod
+BIGQUERY_TABLE=document_embeddings_prod
+
+### settings.py
+
+Add:
+
+bigquery_dataset: str = os.getenv(
+    "BIGQUERY_DATASET",
+    "undp_rag_prod",
+)
+
+bigquery_table: str = os.getenv(
+    "BIGQUERY_TABLE",
+    "document_embeddings_prod",
+)
+### Create the dataset
+
+Run:
+
+bq --location=northamerica-northeast1 mk `
+  --dataset `
+  undp-project-documents:undp_rag_prod
+### write code :
+src/bigquery/load_embeddings.py
+
+It will load:
+
+gs://undp-documents-llm-prod/embeddings/*.jsonl
+
+into:
+
+undp-project-documents.undp_rag_prod.document_embeddings_prod
+
+then chatbot can use BigQuery instead of loading embeddings from GCS.
+
+src/bigquery/load_embeddings.py
+
+```
+python -m src.bigquery.load_embeddings
+
+```
+
+## Next step:
+
+Build BigQuery retriever
+
+Create:
+
+src/retrieval/retriever.py
+
+It will:
+
+1. Embed the user question
+2. Send query embedding to BigQuery
+3. Use VECTOR_SEARCH or cosine distance
+4. Return top chunks
+
+
+```
+python -m src.retrieval.retriever
+
+```
